@@ -75,7 +75,7 @@ export default function GridPage() {
 
         <div className="mt-5 rounded-3xl bg-white p-6 shadow-sm border border-black/5">
           <div className="w-full grid place-items-center">
-            <div className="relative w-44 h-44 rounded-full border-[14px] border-black/10">
+            <div className="relative w-44 h-44 rounded-full border-14 border-black/10">
               <div className="absolute inset-3 rounded-full bg-white grid place-items-center">
                 <div className="text-2xl font-bold">{formatBRL(totalExpenses)}</div>
               </div>
