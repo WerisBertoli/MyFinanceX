@@ -2,6 +2,7 @@
 import Navbar from "@/components/Navbar";
 import AccountCard from "@/components/AccountCard";
 import ScheduledList from "@/components/ScheduledList";
+import PaidList from "@/components/PaidList";
 import { ensureDemoData } from "@/lib/demo";
 import { listAccounts, listTransactions, markTransactionPaid, markTransactionUnpaid } from "@/lib/repository";
 import type { Account } from "@/types/finance";
@@ -54,12 +55,15 @@ export default function Home() {
   }, []);
 
   const balances = useMemo(() => {
+    // saldo considera apenas transações pagas
     const map = new Map<string, number>();
     for (const a of accounts) map.set(a.id, 0);
-    txs.forEach((t) => {
-      const sign = t.type === "income" ? 1 : -1;
-      map.set(t.accountId, (map.get(t.accountId) || 0) + sign * t.amountCents);
-    });
+    txs
+      .filter((t) => t.status === "paid")
+      .forEach((t) => {
+        const sign = t.type === "income" ? 1 : -1;
+        map.set(t.accountId, (map.get(t.accountId) || 0) + sign * t.amountCents);
+      });
     return map;
   }, [accounts, txs]);
 
@@ -72,21 +76,17 @@ export default function Home() {
 
   // Totais pagos por tipo
   const paidTxs = useMemo(() => txs.filter((t) => t.status === "paid"), [txs]);
+  const paidExpenses = useMemo(() => paidTxs.filter((t) => t.type === "expense"), [paidTxs]);
   const incomeTotalCents = useMemo(() => paidTxs.filter(t => t.type === "income").reduce((s,t)=>s+t.amountCents, 0), [paidTxs]);
   const expenseTotalCents = useMemo(() => paidTxs.filter(t => t.type === "expense").reduce((s,t)=>s+t.amountCents, 0), [paidTxs]);
 
   const todayLabel = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
-  // despesas agendadas para o mês atual (tolerante a timezone/UTC)
+  // despesas pendentes (agendadas e vencidas), independente do mês
   const monthScheduled = useMemo(() => {
-    const now = new Date();
-    const yLocal = now.getFullYear();
-    const mLocal = now.getMonth();
     return txs.filter((t) => {
-      if (t.type !== "expense" || t.status !== "scheduled" || typeof t.dueDate !== "number") return false;
-      const d = new Date(t.dueDate);
-      const sameLocal = d.getFullYear() === yLocal && d.getMonth() === mLocal;
-      const sameUTC = d.getUTCFullYear() === yLocal && d.getUTCMonth() === mLocal;
-      return sameLocal || sameUTC;
+      if (t.type !== "expense") return false;
+      if (t.status === "paid") return false;
+      return typeof t.dueDate === "number";
     });
   }, [txs]);
 
@@ -160,8 +160,11 @@ export default function Home() {
             ))}
         </div>
 
-        {/* Lista de despesas do mês (agendadas) */}
+        {/* Lista de despesas pendentes */}
         <ScheduledList items={monthScheduled} onMarkPaid={handleMarkPaid} />
+
+        {/* Lista de despesas pagas */}
+        <PaidList items={paidExpenses} />
 
         {/* Toast de desfazer */}
         {undoTx && (

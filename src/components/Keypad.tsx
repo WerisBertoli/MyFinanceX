@@ -1,6 +1,6 @@
 "use client";
 import { Delete, Calendar, Check } from "lucide-react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 function formatBRL(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -12,9 +12,10 @@ type Props = {
   onChangeNote?: (value: string) => void;
   onConfirm?: (cents: number) => void;
   onCalendar?: () => void;
+  headerRight?: ReactNode;
 };
 
-export default function Keypad({ label, note, onChangeNote, onConfirm, onCalendar }: Props) {
+export default function Keypad({ label, note, onChangeNote, onConfirm, onCalendar, headerRight }: Props) {
   const [value, setValue] = useState<string>("");
 
   const append = (d: string) => setValue((prev) => (prev + d).replace(/^0+/, ""));
@@ -38,7 +39,14 @@ export default function Keypad({ label, note, onChangeNote, onConfirm, onCalenda
 
   return (
     <div className="w-full">
-      {label && <div className="text-center text-xs text-black/50">{label}</div>}
+      {headerRight ? (
+        <div className="flex items-center justify-between">
+          {label ? <div className="text-xs text-black/50">{label}</div> : <div />}
+          {headerRight}
+        </div>
+      ) : (
+        label ? <div className="text-center text-xs text-black/50">{label}</div> : null
+      )}
       <div className={`text-center text-4xl font-extrabold mt-1 ${isZero ? "text-black/30" : ""}`}>{display}</div>
       {onChangeNote && (
         <input

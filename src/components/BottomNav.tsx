@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Home, List, Plus, Calendar, Settings } from "lucide-react";
+import { Home, Plus, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export default function BottomNav() {
@@ -10,17 +10,11 @@ export default function BottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 border-t border-black/10 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="relative mx-auto max-w-md">
-        <div className="grid grid-cols-5 gap-1 p-3 items-end">
+        <div className="grid grid-cols-3 gap-1 p-3 items-end">
           {/* Dashboard */}
           <Link href="/" className={`flex flex-col items-center gap-1 py-1 rounded-2xl ${isActive("/") ? "text-black" : "text-black/60"}`}>
             <Home size={20} />
             <span className="text-[11px]">Dashboard</span>
-          </Link>
-
-          {/* Transactions */}
-          <Link href="/transactions" className={`flex flex-col items-center gap-1 py-1 rounded-2xl ${isActive("/transactions") ? "text-black" : "text-black/60"}`}>
-            <List size={20} />
-            <span className="text-[11px]">Transações</span>
           </Link>
 
           {/* Central + button */}
@@ -29,12 +23,6 @@ export default function BottomNav() {
               <Plus size={24} />
             </Link>
           </div>
-
-          {/* Gastos Fixos */}
-          <Link href="/explore" className={`flex flex-col items-center gap-1 py-1 rounded-2xl ${isActive("/explore") ? "text-black" : "text-black/60"}`}>
-            <Calendar size={20} />
-            <span className="text-[11px]">Gastos Fixos</span>
-          </Link>
 
           {/* User Settings */}
           <Link href="/settings" className={`flex flex-col items-center gap-1 py-1 rounded-2xl ${isActive("/settings") ? "text-black" : "text-black/60"}`}>
